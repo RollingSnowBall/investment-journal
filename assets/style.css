@@ -40,6 +40,10 @@ body {
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Hangul must break at spaces, not between syllables. Without keep-all the
+     default CJK rule splits words like 레버리지 across lines. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* subtle paper grain via layered gradients, kept faint */
