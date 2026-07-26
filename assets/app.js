@@ -214,35 +214,9 @@ async function renderEntry(mount) {
     <article>${marked.parse(md)}</article>`;
 }
 
-/* ---- Principles ----
-   Not a ledger entry. Ledger posts are snapshots and stay frozen; this one is
-   revised as the lenses change, so it lives outside posts/index.json. */
-async function renderPrinciples(mount) {
-  let md = "";
-  try {
-    const res = await fetch("./principles.md", { cache: "no-cache" });
-    if (!res.ok) throw new Error("not found");
-    md = await res.text();
-  } catch (e) {
-    mount.innerHTML = `<a class="back" href="index.html">← 원장으로</a>
-      <p class="empty">원칙을 불러오지 못했어요.</p>`;
-    return;
-  }
-
-  mount.innerHTML = `
-    <a class="back" href="index.html">← 원장으로</a>
-    <header class="entry-header">
-      <h1>원칙</h1>
-      <div class="entry-meta"><span>계속 고쳐 쓰는 문서</span></div>
-    </header>
-    <article>${marked.parse(md)}</article>`;
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const home = document.getElementById("ledger");
   const entry = document.getElementById("entry");
-  const principles = document.getElementById("principles");
   if (home) renderHome(home);
   if (entry) renderEntry(entry);
-  if (principles) renderPrinciples(principles);
 });
