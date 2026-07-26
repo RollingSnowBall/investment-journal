@@ -22,9 +22,12 @@
   --measure:    64ch;
   --page:       50rem;
 
-  --f-display:  "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --f-read:     "Newsreader", Georgia, "Times New Roman", serif;
-  --f-mono:     "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* Space Grotesk, Newsreader and JetBrains Mono carry no Hangul, so the
+     Korean font named after each one is what actually renders most of this
+     site. Without them every Korean glyph falls to the reader's OS default. */
+  --f-display:  "Space Grotesk", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+  --f-read:     "Newsreader", "Noto Serif KR", Georgia, "Times New Roman", serif;
+  --f-mono:     "JetBrains Mono", "Noto Sans KR", ui-monospace, "SFMono-Regular", monospace;
 }
 
 * { box-sizing: border-box; }
