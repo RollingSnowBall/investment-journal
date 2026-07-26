@@ -438,10 +438,14 @@ article th { background: var(--paper-2); font-weight: 600; letter-spacing: .02em
 
 /* ---------- Motion ---------- */
 @media (prefers-reduced-motion: no-preference) {
-  .fade { opacity: 0; transform: translateY(6px); animation: rise .5s ease forwards; }
-  .fade:nth-child(2) { animation-delay: .04s; }
-  .fade:nth-child(3) { animation-delay: .08s; }
-  .fade:nth-child(4) { animation-delay: .12s; }
-  .fade:nth-child(5) { animation-delay: .16s; }
+  /* --i is set per row in app.js, so the stagger keeps working as the ledger
+     grows. The old nth-child list was also off by one (.ledger-head is
+     child 1) and left every row past the fifth with no delay at all. */
+  .fade {
+    opacity: 0;
+    transform: translateY(6px);
+    animation: rise .5s ease forwards;
+    animation-delay: calc(var(--i, 0) * .04s);
+  }
   @keyframes rise { to { opacity: 1; transform: none; } }
 }

@@ -49,14 +49,20 @@ function applyFilters(entries) {
   });
 }
 
+/* The entrance animation is for arriving at the ledger, not for re-filtering
+   it. Re-running it per keystroke made the whole list flash on every letter. */
+let firstPaint = true;
+
 function renderRows(mount, entries, total) {
   if (!entries.length) {
     mount.innerHTML = `<p class="empty">조건에 맞는 기록이 없어요.</p>`;
     return;
   }
+  const animate = firstPaint;
+  firstPaint = false;
   const head = `<div class="ledger-head"><span>날짜</span><span>기록</span><span>티커 · 태그</span></div>`;
-  const rows = entries.map((e) => `
-    <a class="entry-row fade" href="entry.html?id=${encodeURIComponent(e.id)}">
+  const rows = entries.map((e, i) => `
+    <a class="entry-row${animate ? " fade" : ""}" style="--i:${i}" href="entry.html?id=${encodeURIComponent(e.id)}">
       <span class="date">${esc(e.date)}</span>
       <span>
         <span class="title">${esc(e.title)}</span>
