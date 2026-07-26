@@ -5,8 +5,10 @@
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+/* Labels inside a ledger row — no data-tk, so the delegated filter handler
+   ignores them and the click falls through to the row link. */
 function tickerChips(tks = []) {
-  return tks.map((t) => `<span class="tk" data-tk="${esc(t)}">${esc(t)}</span>`).join("");
+  return tks.map((t) => `<span class="tk">${esc(t)}</span>`).join("");
 }
 
 async function loadIndex() {
@@ -152,10 +154,10 @@ async function renderHome(mount) {
     });
   }
 
-  // one delegated handler: tape buttons, tag bar buttons, chips inside rows
+  // one delegated handler, buttons only: the tape and the tag bar
   document.addEventListener("click", (ev) => {
-    const tkEl = ev.target.closest("[data-tk]");
-    const tagEl = ev.target.closest("[data-tag], .entry-row .tag");
+    const tkEl = ev.target.closest("button[data-tk]");
+    const tagEl = ev.target.closest("button[data-tag]");
     if (tkEl) {
       ev.preventDefault();
       const v = tkEl.dataset.tk;

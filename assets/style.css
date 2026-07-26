@@ -143,7 +143,8 @@ body::before {
   white-space: nowrap;
 }
 
-/* interactive chips (tape / tag bar / row chips) */
+/* Interactive chips live in the tape, the tag bar and the entry meta line.
+   Chips inside a ledger row are labels, not controls — the row is the link. */
 button.tk, button.tag {
   cursor: pointer;
   appearance: none;
@@ -151,9 +152,8 @@ button.tk, button.tag {
 }
 button.tag { background: transparent; }
 button.tk { background: rgba(255,255,255,.4); }
-button.tk:hover, .entry-row .tk:hover { border-color: var(--ink-soft); color: var(--ink); }
-button.tag:hover, .entry-row .tag:hover { border-color: currentColor; }
-.entry-row .tk, .entry-row .tag { cursor: pointer; }
+button.tk:hover, .entry-meta a.tk:hover { border-color: var(--ink-soft); color: var(--ink); }
+button.tag:hover, .entry-meta a.tag:hover { border-color: currentColor; }
 a.tk { text-decoration: none; }
 .entry-meta a.tag { text-decoration: none; }
 
