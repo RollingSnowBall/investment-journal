@@ -232,14 +232,17 @@ a.tk { text-decoration: none; }
   padding-top: .18rem;
 }
 .entry-row .title {
+  display: block;
   font-family: var(--f-display);
   font-weight: 500;
   font-size: 1.16rem;
   letter-spacing: -.01em;
   line-height: 1.25;
   color: var(--ink);
+  margin: 0;
 }
 .entry-row .summary {
+  display: block;
   font-family: var(--f-read);
   color: var(--ink-soft);
   font-size: .95rem;
