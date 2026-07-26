@@ -153,11 +153,6 @@ button.tag { background: transparent; }
 button.tk { background: rgba(255,255,255,.4); }
 button.tk:hover, .entry-row .tk:hover { border-color: var(--ink-soft); color: var(--ink); }
 button.tag:hover, .entry-row .tag:hover { border-color: currentColor; }
-.tk.on, .tag.on {
-  background: var(--ink);
-  color: var(--paper) !important;
-  border-color: var(--ink);
-}
 .entry-row .tk, .entry-row .tag { cursor: pointer; }
 a.tk { text-decoration: none; }
 .entry-meta a.tag { text-decoration: none; }
@@ -320,6 +315,15 @@ article a:focus-visible,
 .tag[data-k="관망"]     { color: var(--muted); border-color: var(--rule); }
 .tag[data-k="리서치"]   { color: var(--ink-soft); border-color: var(--rule); }
 .tag[data-k="회고"]     { color: var(--brick); border-color: color-mix(in srgb, var(--brick) 35%, transparent); }
+
+/* Must sit after the per-tag colours above: those carry the same (0,2,0)
+   specificity, so an earlier .on block loses border-color to whichever
+   data-k rule matches. */
+.tk.on, .tag.on {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
 
 /* ---------- Entry page ---------- */
 .back {
