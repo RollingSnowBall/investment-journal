@@ -118,10 +118,13 @@ body::before {
   margin-right: .35rem;
 }
 .tk {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--f-mono);
   font-size: .72rem;
   letter-spacing: .02em;
   padding: .16rem .5rem;
+  min-height: 1.75rem;
   border: 1px solid var(--rule);
   border-radius: 2px;
   color: var(--ink-soft);
@@ -147,6 +150,15 @@ button.tag:hover, .entry-row .tag:hover { border-color: currentColor; }
 .entry-row .tk, .entry-row .tag { cursor: pointer; }
 a.tk { text-decoration: none; }
 .entry-meta a.tag { text-decoration: none; }
+
+/* Touch devices get a full 44px target on the filter controls without
+   inflating the chips visually on desktop. */
+@media (pointer: coarse) {
+  button.tk, button.tag, .fclear, .entry-meta a.tk, .entry-meta a.tag {
+    min-height: 2.75rem;
+    padding-inline: .7rem;
+  }
+}
 
 /* ---------- Search & filter controls ---------- */
 .controls { padding: 1.3rem 0 .2rem; }
@@ -263,11 +275,16 @@ a.tk { text-decoration: none; }
 .entry-row .tks { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: flex-end; max-width: 12rem; }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--f-mono);
-  font-size: .62rem;
-  letter-spacing: .12em;
+  font-size: .7rem;
+  /* .12em tracking was set for Latin labels; on Hangul it just pulls
+     syllables apart and hurts legibility at this size. */
+  letter-spacing: .04em;
   text-transform: uppercase;
-  padding: .12rem .45rem;
+  padding: .12rem .5rem;
+  min-height: 1.75rem;
   border-radius: 2px;
   border: 1px solid transparent;
   white-space: nowrap;
