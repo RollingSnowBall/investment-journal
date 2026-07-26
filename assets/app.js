@@ -14,8 +14,10 @@ function tickerChips(tks = []) {
 async function loadIndex() {
   const res = await fetch("./posts/index.json", { cache: "no-cache" });
   const data = await res.json();
-  // newest first
-  return data.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+  // Newest first. Dates are YYYY-MM, so several posts share a month; the
+  // comparator has to return 0 for those or the sort reorders them and
+  // index.json stops controlling within-month order.
+  return data.slice().sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
 }
 
 /* ---- Home: ledger + search/filter ---- */
