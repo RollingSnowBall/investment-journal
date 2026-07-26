@@ -83,13 +83,13 @@ function renderControls(entries) {
   const tape = document.getElementById("tape");
   if (tape) {
     tape.innerHTML = `<span class="lead">Tracking</span>` + tickers.map((t) =>
-      `<button type="button" class="tk${state.tk === t ? " on" : ""}" data-tk="${esc(t)}">${esc(t)}</button>`
+      `<button type="button" class="tk${state.tk === t ? " on" : ""}" aria-pressed="${state.tk === t}" data-tk="${esc(t)}">${esc(t)}</button>`
     ).join("");
   }
   const tagbar = document.getElementById("tagbar");
   if (tagbar) {
     tagbar.innerHTML = tags.map((t) =>
-      `<button type="button" class="tag${state.tag === t ? " on" : ""}" data-k="${esc(t)}" data-tag="${esc(t)}">${esc(t)}</button>`
+      `<button type="button" class="tag${state.tag === t ? " on" : ""}" aria-pressed="${state.tag === t}" data-k="${esc(t)}" data-tag="${esc(t)}">${esc(t)}</button>`
     ).join("");
   }
 }
