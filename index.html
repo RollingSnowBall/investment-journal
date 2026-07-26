@@ -18,14 +18,17 @@
         <h1>투자 원장</h1>
       </a>
       <p class="sub">Claude와 나눈 판단들을 다시 꺼내 보기 위한 기록. 정답이 아니라 그때의 근거를 남긴다.</p>
-      <div class="tape">
-        <span class="lead">Tracking</span>
-        <span class="tk">PLTR</span><span class="tk">UNH</span><span class="tk">ON</span>
-        <span class="tk">BN</span><span class="tk">OXY</span><span class="tk">SCHD</span>
-        <span class="tk">SGOV</span><span class="tk">MSFT</span><span class="tk">AMZN</span>
-        <span class="tk">GOOGL</span><span class="tk">BTC</span>
-      </div>
+      <div class="tape" id="tape"><span class="lead">Tracking</span></div>
     </header>
+
+    <div class="controls">
+      <input class="search" id="q" type="search" placeholder="검색 — 제목 · 요약 · 티커" autocomplete="off" />
+      <div class="tagbar" id="tagbar"></div>
+      <div class="filter-status" id="fstatus" hidden>
+        <span id="fcount"></span>
+        <button class="fclear" id="fclear" type="button">필터 해제 ×</button>
+      </div>
+    </div>
 
     <main id="ledger"><p class="empty">불러오는 중…</p></main>
 
