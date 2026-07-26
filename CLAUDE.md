@@ -20,9 +20,10 @@
 2. `posts/index.json` 맨 위에 메타 한 줄 추가 — `id`는 파일명과 정확히 일치, `date`는 `YYYY-MM`, `tickers`는 배열
 3. push
 
-대화를 글로 옮길 때는 `POSTING-PROMPT.md`를 쓴다 — 기존 글들의 양식(결론 먼저 → 근거 →
-자기 검증 절 → 조건부 다음 행동)을 규칙으로 정리해 둔 프롬프트. 본문과 index.json 한 줄을
-같이 뽑아준다.
+대화를 글로 옮길 때는 **`investment-journal` 스킬**을 쓴다. 원본은
+`skills/investment-journal/SKILL.md`, 설치 위치는 `~/.claude/skills/investment-journal/`.
+투자 대화를 나눈 그 창에서 발동하면 본문과 index.json 한 줄을 같이 뽑아준다.
+스킬을 고치면 저장소 쪽 원본을 고치고 설치 위치로 복사한다.
 
 ## 구조
 
