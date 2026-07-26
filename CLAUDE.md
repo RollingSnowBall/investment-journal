@@ -16,9 +16,23 @@
 
 ## 글 추가 방법
 
-1. `posts/<id>.md` 생성 (id 예: `2026-07-nvda-review`)
-2. `posts/index.json` 맨 위에 메타 한 줄 추가 — `id`는 파일명과 정확히 일치, `date`는 `YYYY-MM`, `tickers`는 배열
-3. push
+초고를 `_drafts/`에 떨어뜨리고 컴파일한다.
+
+```bash
+python tools/compile.py --dry-run   # 검증만
+python tools/compile.py             # posts/ 로 넘기고 index.json 갱신
+```
+
+`_drafts/`는 컴파일 전 자리다. Jekyll이 `_` 디렉토리를 배포에서 빼기 때문에
+저장소에는 남지만 웹에는 뜨지 않는다. 초고는 frontmatter + 본문 형식이고,
+컴파일이 검증한 뒤 frontmatter를 떼서 `posts/<id>.md`로 옮기고 `index.json`에
+날짜 순서대로 끼워 넣는다. 처리한 초고는 `_drafts/published/`로 치운다.
+
+**`posts/*.md`에는 frontmatter를 넣지 말 것.** Jekyll이 frontmatter 붙은 파일을
+HTML로 변환해 버리는데, 사이트는 원본 마크다운을 fetch해서 marked.js에 넘긴다.
+컴파일이 이걸 보장하므로 손으로 만들지 말고 `_drafts/`를 거친다.
+
+형식과 검증 항목은 `_drafts/README.md`에 있다.
 
 대화를 글로 옮길 때는 **`investment-journal` 스킬**을 쓴다. 원본은
 `skills/investment-journal/SKILL.md`, 설치 위치는 `~/.claude/skills/investment-journal/`.
@@ -30,10 +44,13 @@
 ```
 index.html        홈 — 원장 인덱스 + 검색/태그/티커 필터
 entry.html        글 한 편 렌더링 (marked.js CDN)
-assets/app.js     렌더링 + 필터 로직 (필터 상태는 URL 쿼리 ?q=&tag=&tk=)
+assets/app.js     렌더링 + 필터 로직 + !!빨강!! ==형광펜== 확장
 assets/style.css  디자인 (paper/ink 팔레트 + 한글 Noto Serif/Sans KR)
 posts/index.json  글 목록 메타데이터 — 홈의 티커 줄·태그 바는 여기서 자동 생성
-posts/*.md        글 본문
+posts/*.md        글 본문 (컴파일 결과, frontmatter 없음)
+_drafts/          컴파일 전 초고 — 배포 안 됨
+tools/compile.py  _drafts/ → posts/ 검증·이동
+skills/           investment-journal 스킬 원본
 ```
 
 글 안에서 다른 글을 링크할 때는 `[글 제목](entry.html?id=<posts/index.json의 id>)`.
