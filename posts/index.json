@@ -1,0 +1,26 @@
+[
+  {
+    "id": "2025-08-schd-to-unh",
+    "title": "SCHD 절반을 덜어 UNH로",
+    "date": "2025-08",
+    "tag": "리밸런싱",
+    "tickers": ["SCHD", "UNH", "PLTR"],
+    "summary": "배당 기회비용을 감수하고 저평가 구간의 UNH를 매집. 이길 확률이 높은 게임이라 봤다."
+  },
+  {
+    "id": "2026-04-bigtech-weight",
+    "title": "PLTR는 적립식 유지, 빅테크 비중은 고민 중",
+    "date": "2026-04",
+    "tag": "관점정리",
+    "tickers": ["PLTR", "MSFT", "AMZN", "GOOGL", "OXY", "BN"],
+    "summary": "섹터 비중을 에너지 인프라로 옮기고 싶다는 게 진짜 이유. '느낌'으로 종목을 고르지 말 것."
+  },
+  {
+    "id": "2026-03-btc-coin-mstr",
+    "title": "BTC · COIN · MSTR — 아직은 관망",
+    "date": "2026-03",
+    "tag": "관망",
+    "tickers": ["BTC", "COIN", "MSTR"],
+    "summary": "변동성이 큰 친구들이라 조심스럽다. 들어간다면 레버리지 구조보다 BTC 직접이 먼저."
+  }
+]
