@@ -1,0 +1,38 @@
+# CLAUDE.md
+
+투자 원장 (Investment Journal) — 빌드 없는 정적 사이트. GitHub Pages 배포.
+
+- 라이브: https://rollingsnowball.github.io/investment-journal/
+- 저장소: https://github.com/RollingSnowBall/investment-journal (public, Pages = main 브랜치 루트)
+- 배포 = `git push` 하면 끝. 1~2분 뒤 반영.
+
+## 콘텐츠 규칙
+
+- 태그는 **5개 고정**: `리밸런싱` `관점정리` `관망` `리서치` `회고`. 새 태그를 만들지 말 것.
+- AI와의 대화는 원문 그대로 올리지 않는다 — 리포트/문서로 정리해서 위 태그 중 하나로 포스팅.
+- 계좌 금액·총자산·개인정보는 올리지 않는다 (public 저장소).
+
+## 글 추가 방법
+
+1. `posts/<id>.md` 생성 (id 예: `2026-07-nvda-review`)
+2. `posts/index.json` 맨 위에 메타 한 줄 추가 — `id`는 파일명과 정확히 일치, `date`는 `YYYY-MM`, `tickers`는 배열
+3. push
+
+## 구조
+
+```
+index.html        홈 — 원장 인덱스 + 검색/태그/티커 필터
+entry.html        글 한 편 렌더링 (marked.js CDN)
+assets/app.js     렌더링 + 필터 로직 (필터 상태는 URL 쿼리 ?q=&tag=&tk=)
+assets/style.css  디자인 (paper/ink 팔레트, Space Grotesk + Newsreader + JetBrains Mono)
+posts/index.json  글 목록 메타데이터 — 홈의 티커 줄·태그 바는 여기서 자동 생성
+posts/*.md        글 본문
+```
+
+- 로컬 미리보기: `python -m http.server 8000` (fetch를 쓰므로 파일 더블클릭으로는 안 뜸)
+- 홈 노출 차단: `noindex` 메타 적용됨. 검색 노출을 원하면 제거.
+
+## gstack
+
+gstack 스킬 팩 설치됨 (`~/.claude/skills/gstack`). 이 프로젝트에서 유용한 것:
+`/design-review` (UI/UX 검증+수정), `/qa` (브라우저 기능 테스트), `/ship`, `/investigate`.
