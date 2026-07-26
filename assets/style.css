@@ -283,7 +283,7 @@ article a:focus-visible,
   font-family: var(--f-read);
   color: var(--ink-soft);
   font-size: .95rem;
-  margin-top: .25rem;
+  margin: .25rem 0 0;
   max-width: 52ch;
 }
 .entry-row .meta-right {

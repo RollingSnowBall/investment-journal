@@ -64,10 +64,10 @@ function renderRows(mount, entries, total) {
   const rows = entries.map((e, i) => `
     <a class="entry-row${animate ? " fade" : ""}" style="--i:${i}" href="entry.html?id=${encodeURIComponent(e.id)}">
       <span class="date">${esc(e.date)}</span>
-      <span>
-        <span class="title">${esc(e.title)}</span>
-        ${e.summary ? `<span class="summary">${esc(e.summary)}</span>` : ""}
-      </span>
+      <div class="rec">
+        <h2 class="title">${esc(e.title)}</h2>
+        ${e.summary ? `<p class="summary">${esc(e.summary)}</p>` : ""}
+      </div>
       <span class="meta-right">
         <span class="tag" data-k="${esc(e.tag || "")}">${esc(e.tag || "")}</span>
         <span class="tks">${tickerChips(e.tickers)}</span>
