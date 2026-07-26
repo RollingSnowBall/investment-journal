@@ -5,6 +5,38 @@
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+/* Shorthand emphasis in post markdown:
+     !!텍스트!!  -> 빨간 글씨
+     ==텍스트==  -> 형광펜
+   There is no build step — marked renders the .md in the browser — so these
+   are registered as inline extensions instead. Raw HTML still works too.
+   Nesting is fine (!!**굵은 빨강**!!) because the inner text is re-tokenized,
+   and marked never runs inline rules inside code, so `!!x!!` stays literal. */
+function inlineWrap(name, delim, open, close) {
+  const re = new RegExp(`^${delim}(?=\\S)([\\s\\S]*?\\S)${delim}`);
+  return {
+    name,
+    level: "inline",
+    start: (src) => src.indexOf(delim.replace(/\\/g, "")),
+    tokenizer(src) {
+      const m = re.exec(src);
+      if (m) return { type: name, raw: m[0], tokens: this.lexer.inlineTokens(m[1]) };
+    },
+    renderer(token) {
+      return open + this.parser.parseInline(token.tokens) + close;
+    },
+  };
+}
+
+if (typeof marked !== "undefined") {
+  marked.use({
+    extensions: [
+      inlineWrap("hl", "!!", '<span class="hl">', "</span>"),
+      inlineWrap("hlmark", "==", "<mark>", "</mark>"),
+    ],
+  });
+}
+
 /* Labels inside a ledger row — no data-tk, so the delegated filter handler
    ignores them and the click falls through to the row link. */
 function tickerChips(tks = []) {
