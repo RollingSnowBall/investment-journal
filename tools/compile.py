@@ -50,12 +50,41 @@ def write(path, text):
         f.write(text)
 
 
-def split_front(text):
-    """--- ... --- 프론트매터와 본문을 가른다."""
-    m = re.match(r"^﻿?---\s*\n(.*?)\n---\s*\n?(.*)$", text, re.S)
-    if not m:
-        return None, text
-    return m.group(1), m.group(2).lstrip("\n")
+def split_meta(text):
+    """앞머리의 메타와 본문을 가른다. 세 형식을 다 받는다.
+
+    1) index.json 한 덩어리를 그대로 붙인 것 (스킬이 내는 형식)
+    2) ```json 펜스로 감싼 같은 것
+    3) --- 로 감싼 YAML frontmatter
+
+    반환: (meta dict | None, body, 형식이름)
+    """
+    t = text.lstrip("﻿").lstrip()
+
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", t, re.S)
+    if m:
+        return parse_front(m.group(1)), m.group(2).lstrip("\n"), "yaml"
+
+    fenced = re.match(r"^```(?:json)?\s*\n(.*?)\n```\s*\n?(.*)$", t, re.S)
+    if fenced and fenced.group(1).lstrip().startswith("{"):
+        try:
+            return json.loads(fenced.group(1)), fenced.group(2).lstrip("\n"), "json (펜스)"
+        except ValueError as e:
+            return None, "JSON 을 읽을 수 없다: %s" % e, None
+
+    if t.startswith("{"):
+        try:
+            obj, end = json.JSONDecoder().raw_decode(t)
+        except ValueError as e:
+            return None, "JSON 을 읽을 수 없다: %s" % e, None
+        if isinstance(obj, dict):
+            # index.json 에서 통째로 복사하면 닫는 중괄호 뒤에 쉼표가 따라온다
+            body = t[end:].lstrip()
+            if body.startswith(","):
+                body = body[1:]
+            return obj, body.lstrip("\n"), "json"
+
+    return None, text, None
 
 
 def parse_front(block):
@@ -99,12 +128,14 @@ def dump_index(entries):
     return "\n".join(out) + "\n"
 
 
-def validate(meta, body, index, taken, name):
+def validate(meta, body, taken):
     errs, warns = [], []
 
     for f in FIELDS:
         if f not in meta or (f != "tickers" and not str(meta.get(f, "")).strip()):
-            errs.append("frontmatter 에 %s 가 없다" % f)
+            errs.append("메타에 %s 가 없다" % f)
+    if not isinstance(meta.get("tickers", []), list):
+        errs.append("tickers 가 배열이 아니다")
     if errs:
         return errs, warns
 
@@ -162,14 +193,15 @@ def main():
 
     for path in drafts:
         name = os.path.basename(path)
-        front, body = split_front(read(path))
-        if front is None:
-            print("  [실패] %s — frontmatter 가 없다 (--- 로 감싼 메타)" % name)
+        meta, body, kind = split_meta(read(path))
+        if meta is None:
+            reason = body if kind is None and body.startswith("JSON") else \
+                "앞머리에 메타가 없다 (index.json 덩어리 또는 --- YAML)"
+            print("  [실패] %s — %s" % (name, reason))
             failed += 1
             continue
 
-        meta = parse_front(front)
-        errs, warns = validate(meta, body, index, taken, name)
+        errs, warns = validate(meta, body, taken)
 
         if errs:
             print("  [실패] %s" % name)
@@ -178,7 +210,7 @@ def main():
             failed += 1
             continue
 
-        print("  [통과] %s → posts/%s.md" % (name, meta["id"]))
+        print("  [통과] %s (%s) → posts/%s.md" % (name, kind, meta["id"]))
         for w in warns:
             print("         경고: %s" % w)
 
@@ -194,13 +226,15 @@ def main():
         return 1
 
     os.makedirs(DONE, exist_ok=True)
+    fresh = []
     for path, meta, body in staged:
         write(os.path.join(POSTS, meta["id"] + ".md"), body.rstrip() + "\n")
-        entry = {k: meta[k] for k in FIELDS}
-        # 날짜 내림차순을 지키되, 같은 달이면 새 글이 위로 간다
-        pos = next((i for i, e in enumerate(index) if e["date"] <= entry["date"]), len(index))
-        index.insert(pos, entry)
+        fresh.append({k: meta[k] for k in FIELDS})
         shutil.move(path, os.path.join(DONE, os.path.basename(path)))
+
+    # 날짜 내림차순. sorted 는 안정 정렬이라 같은 달 안에서는 이번에 들어온 글이
+    # 처리 순서 그대로 위에 놓이고, 기존 글의 상대 순서도 그대로 남는다.
+    index = sorted(fresh + index, key=lambda e: e["date"], reverse=True)
 
     write(INDEX, dump_index(index))
     print("\n%d편 컴파일했다. 초고는 _drafts/published/ 로 옮겼다." % len(staged))
