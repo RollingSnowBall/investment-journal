@@ -173,10 +173,25 @@ a.tk { text-decoration: none; }
   border: none;
   border-bottom: 1px solid var(--rule);
   padding: .45rem 0;
-  outline: none;
 }
 .search::placeholder { color: var(--muted); }
 .search:focus { border-bottom-color: var(--pine); }
+
+/* Every other control had :hover but no keyboard affordance; .entry-row was
+   the only focusable thing on the page that showed where you were. */
+.search:focus-visible,
+button.tk:focus-visible,
+button.tag:focus-visible,
+.fclear:focus-visible,
+.back:focus-visible,
+a.tk:focus-visible,
+.entry-meta a.tag:focus-visible,
+article a:focus-visible,
+.masthead a.home:focus-visible {
+  outline: 2px solid var(--pine);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
 .tagbar {
   display: flex;
   flex-wrap: wrap;
