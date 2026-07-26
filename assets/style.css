@@ -437,6 +437,17 @@ article th { background: var(--paper-2); font-weight: 600; letter-spacing: .02em
 }
 
 /* ---------- Motion ---------- */
+/* .fade opts in below, but the .entry-row hover transition sat outside any
+   motion guard, so reduced-motion users still got the sliding row. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* --i is set per row in app.js, so the stagger keeps working as the ledger
      grows. The old nth-child list was also off by one (.ledger-head is
