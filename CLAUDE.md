@@ -27,11 +27,22 @@
 ```
 index.html        홈 — 원장 인덱스 + 검색/태그/티커 필터
 entry.html        글 한 편 렌더링 (marked.js CDN)
+principles.html   원칙 페이지 — principles.md 렌더링
+principles.md     투자 원칙 (원장과 별개, 계속 고쳐 쓰는 문서)
 assets/app.js     렌더링 + 필터 로직 (필터 상태는 URL 쿼리 ?q=&tag=&tk=)
-assets/style.css  디자인 (paper/ink 팔레트, Space Grotesk + Newsreader + JetBrains Mono)
+assets/style.css  디자인 (paper/ink 팔레트 + 한글 Noto Serif/Sans KR)
 posts/index.json  글 목록 메타데이터 — 홈의 티커 줄·태그 바는 여기서 자동 생성
 posts/*.md        글 본문
 ```
+
+## 원칙 페이지
+
+`principles.md`는 **원장 글이 아니다.** `posts/index.json`에 넣지 말 것.
+원장 글은 그때의 판단을 얼려 두는 스냅샷이라 고치지 않고, 원칙은 배우면서 고쳐 쓰는
+문서라서 분리했다. 고칠 때는 `principles.md`만 수정하면 된다.
+
+원칙에 적용 사례를 붙이려면 해당 항목 끝에 마크다운 링크 한 줄을 추가한다:
+`→ 적용: [글 제목](entry.html?id=<posts/index.json의 id>)`
 
 - 로컬 미리보기: `python -m http.server 8000` (fetch를 쓰므로 파일 더블클릭으로는 안 뜸)
 - 홈 노출 차단: `noindex` 메타 적용됨. 검색 노출을 원하면 제거.
