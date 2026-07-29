@@ -23,6 +23,8 @@
   --measure:    64ch;
   --page:       50rem;
 
+  --x-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 2.5l7 7M9.5 2.5l-7 7' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+
   /* Space Grotesk, Newsreader and JetBrains Mono carry no Hangul, so the
      Korean font named after each one is what actually renders most of this
      site. Without them every Korean glyph falls to the reader's OS default. */
@@ -116,22 +118,6 @@ body::before {
   max-width: 46ch;
 }
 
-/* tracked universe strip */
-.tape {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem .5rem;
-  margin-top: 1.5rem;
-  align-items: center;
-}
-.tape .lead {
-  font-family: var(--f-mono);
-  font-size: .66rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-right: .35rem;
-}
 .tk {
   display: inline-flex;
   align-items: center;
@@ -147,50 +133,120 @@ body::before {
   white-space: nowrap;
 }
 
-/* Interactive chips live in the tape, the tag bar and the entry meta line.
-   Chips inside a ledger row are labels, not controls — the row is the link. */
-button.tk, button.tag {
+/* Interactive chips live in the tag bar and the entry meta line. Chips inside
+   a ledger row are labels, not controls — the row itself is the link. */
+button.tag {
   cursor: pointer;
   appearance: none;
   margin: 0;
+  background: transparent;
 }
-button.tag { background: transparent; }
-button.tk { background: rgba(255,255,255,.4); }
-button.tk:hover, .entry-meta a.tk:hover { border-color: var(--ink-soft); color: var(--ink); }
 button.tag:hover, .entry-meta a.tag:hover { border-color: currentColor; }
+.entry-meta a.tk:hover { border-color: var(--ink-soft); color: var(--ink); }
 a.tk { text-decoration: none; }
 .entry-meta a.tag { text-decoration: none; }
 
 /* Touch devices get a full 44px target on the filter controls without
    inflating the chips visually on desktop. */
 @media (pointer: coarse) {
-  button.tk, button.tag, .fclear, .entry-meta a.tk, .entry-meta a.tag {
+  button.tag, .fclear, .entry-meta a.tk, .entry-meta a.tag {
     min-height: 2.75rem;
     padding-inline: .7rem;
   }
+  .search { min-height: 2.75rem; }
 }
 
 /* ---------- Search & filter controls ---------- */
 .controls { padding: 1.3rem 0 .2rem; }
+/* A bottom rule alone didn't read as a field — it looked like a caption until
+   you clicked it. Full box + magnifier, still quiet enough for the paper. */
+.searchbox {
+  position: relative;
+  max-width: 30rem;
+}
+.searchbox .sicon {
+  position: absolute;
+  left: .68rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: .92rem;
+  height: .92rem;
+  color: var(--muted);
+  pointer-events: none;
+  transition: color .15s ease;
+}
+.searchbox:focus-within .sicon { color: var(--pine); }
 .search {
   width: 100%;
-  max-width: 30rem;
   font-family: var(--f-mono);
   font-size: .82rem;
   letter-spacing: .02em;
   color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--rule);
-  padding: .45rem 0;
+  background: rgba(255,255,255,.55);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: .5rem .7rem .5rem 2.05rem;
+  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
 }
 .search::placeholder { color: var(--muted); }
-.search:focus { border-bottom-color: var(--pine); }
+/* Chrome's stock clear button is a blue glyph — masked to ink so it belongs. */
+.search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: .7rem;
+  height: .7rem;
+  cursor: pointer;
+  opacity: .45;
+  background: currentColor;
+  -webkit-mask: var(--x-glyph) center / contain no-repeat;
+  mask: var(--x-glyph) center / contain no-repeat;
+}
+.search::-webkit-search-cancel-button:hover { opacity: .9; }
+.search:hover { border-color: color-mix(in srgb, var(--ink) 22%, transparent); }
+.search:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--pine);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pine) 10%, transparent);
+}
+
+/* Ticker suggestions — the tracked universe, on demand instead of pinned to
+   the masthead. Overlays the ledger rather than pushing them down. */
+.suggest {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: .25rem 0;
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: 0 6px 20px rgba(23,27,33,.09);
+}
+.suggest[hidden] { display: none; }
+.sugg-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .38rem .7rem;
+  font-family: var(--f-mono);
+  font-size: .78rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.sugg-opt .sg-n { font-size: .66rem; color: var(--muted); }
+.sugg-opt:hover, .sugg-opt.on { background: var(--paper-2); color: var(--ink); }
+.sugg-opt.on { box-shadow: inset 2px 0 0 var(--pine); }
+@media (pointer: coarse) {
+  .sugg-opt { padding-block: .7rem; }
+}
 
 /* Every other control had :hover but no keyboard affordance; .entry-row was
    the only focusable thing on the page that showed where you were. */
-.search:focus-visible,
-button.tk:focus-visible,
 button.tag:focus-visible,
 .fclear:focus-visible,
 .back:focus-visible,
@@ -324,7 +380,7 @@ article a:focus-visible,
 /* Must sit after the per-tag colours above: those carry the same (0,2,0)
    specificity, so an earlier .on block loses border-color to whichever
    data-k rule matches. */
-.tk.on, .tag.on {
+.tag.on {
   background: var(--ink);
   color: var(--paper);
   border-color: var(--ink);

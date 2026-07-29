@@ -113,20 +113,9 @@ function renderRows(mount, entries, total) {
 }
 
 function renderControls(entries) {
-  // tickers by frequency, tags in first-seen order
-  const tkCount = new Map();
-  const tags = [];
+  const tags = [];                      // first-seen order
   for (const e of entries) {
-    for (const t of e.tickers || []) tkCount.set(t, (tkCount.get(t) || 0) + 1);
     if (e.tag && !tags.includes(e.tag)) tags.push(e.tag);
-  }
-  const tickers = [...tkCount.keys()].sort((a, b) => tkCount.get(b) - tkCount.get(a));
-
-  const tape = document.getElementById("tape");
-  if (tape) {
-    tape.innerHTML = `<span class="lead">Tracking</span>` + tickers.map((t) =>
-      `<button type="button" class="tk${state.tk === t ? " on" : ""}" aria-pressed="${state.tk === t}" data-tk="${esc(t)}">${esc(t)}</button>`
-    ).join("");
   }
   const tagbar = document.getElementById("tagbar");
   if (tagbar) {
@@ -134,6 +123,102 @@ function renderControls(entries) {
       `<button type="button" class="tag${state.tag === t ? " on" : ""}" aria-pressed="${state.tag === t}" data-k="${esc(t)}" data-tag="${esc(t)}">${esc(t)}</button>`
     ).join("");
   }
+}
+
+/* Ticker filtering used to be a strip of every ticker ever mentioned, sitting
+   in the masthead. That grows one chip per ticker with no ceiling, and a name
+   written about once looked exactly as important as a core holding. Tickers
+   are reached by typing into the search box instead — same keystrokes, and the
+   masthead stays one line at any number of posts. Focusing the empty box lists
+   the most-written ones so the universe is still browsable without knowing it. */
+const SUGGEST_MAX = 7;
+
+function tickerUniverse(entries) {
+  const n = new Map();
+  for (const e of entries) for (const t of e.tickers || []) n.set(t, (n.get(t) || 0) + 1);
+  return [...n.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([t, count]) => ({ t, count }));
+}
+
+function matchTickers(universe, q) {
+  const s = q.trim().toUpperCase();
+  if (!s) return universe.slice(0, SUGGEST_MAX);
+  // prefix before substring, so typing "MS" offers MSFT/MSTR ahead of anything
+  // that merely contains the letters
+  const pre = universe.filter((u) => u.t.startsWith(s));
+  const mid = universe.filter((u) => !u.t.startsWith(s) && u.t.includes(s));
+  return [...pre, ...mid].slice(0, SUGGEST_MAX);
+}
+
+/* Combobox over the search input. onPick receives the chosen ticker. */
+function wireTickerSuggest(input, entries, onPick) {
+  const list = document.getElementById("tksuggest");
+  if (!input || !list) return;
+  const universe = tickerUniverse(entries);
+  let items = [];
+  let active = -1;
+
+  const close = () => {
+    list.hidden = true;
+    list.innerHTML = "";
+    input.setAttribute("aria-expanded", "false");
+    input.removeAttribute("aria-activedescendant");
+    items = [];
+    active = -1;
+  };
+
+  const paint = () => {
+    list.innerHTML = items.map((u, i) =>
+      `<li class="sugg-opt${i === active ? " on" : ""}" role="option" id="sg-${i}" aria-selected="${i === active}" data-pick="${esc(u.t)}"><span class="sg-tk">${esc(u.t)}</span><span class="sg-n">${u.count}건</span></li>`
+    ).join("");
+    if (active >= 0) input.setAttribute("aria-activedescendant", `sg-${active}`);
+    else input.removeAttribute("aria-activedescendant");
+  };
+
+  const open = () => {
+    items = matchTickers(universe, input.value);
+    if (!items.length) return close();
+    active = -1;
+    paint();
+    list.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  };
+
+  input.addEventListener("input", open);
+  input.addEventListener("focus", open);
+  input.addEventListener("blur", close);
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") return close();
+    if (list.hidden) {
+      if (ev.key === "ArrowDown") open();
+      return;
+    }
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+      ev.preventDefault();
+      active = ev.key === "ArrowDown"
+        ? (active < 0 ? 0 : (active + 1) % items.length)
+        : (active <= 0 ? items.length - 1 : active - 1);
+      paint();
+    } else if (ev.key === "Enter" && active >= 0) {
+      ev.preventDefault();
+      const t = items[active].t;
+      close();
+      onPick(t);
+    } else if (ev.key === "Tab") {
+      close();
+    }
+  });
+  // mousedown, not click: blur would tear the list down before click landed.
+  // preventDefault keeps focus in the input so no blur fires at all.
+  list.addEventListener("mousedown", (ev) => {
+    const li = ev.target.closest("li[data-pick]");
+    if (!li) return;
+    ev.preventDefault();
+    const t = li.dataset.pick;
+    close();
+    onPick(t);
+  });
 }
 
 function renderStatus(shown, total) {
@@ -178,6 +263,14 @@ async function renderHome(mount) {
 
   if (searchEl) {
     searchEl.addEventListener("input", () => { state.q = searchEl.value; update(); });
+    // What was typed was a way of reaching the ticker, not a text query — swap
+    // the text for the exact filter so the two don't stack and fight.
+    wireTickerSuggest(searchEl, entries, (t) => {
+      state.tk = t;
+      state.q = "";
+      searchEl.value = "";
+      update();
+    });
   }
   const clearEl = document.getElementById("fclear");
   if (clearEl) {
@@ -188,16 +281,10 @@ async function renderHome(mount) {
     });
   }
 
-  // one delegated handler, buttons only: the tape and the tag bar
+  // one delegated handler for the tag bar; tickers come from the search box
   document.addEventListener("click", (ev) => {
-    const tkEl = ev.target.closest("button[data-tk]");
     const tagEl = ev.target.closest("button[data-tag]");
-    if (tkEl) {
-      ev.preventDefault();
-      const v = tkEl.dataset.tk;
-      state.tk = state.tk === v ? "" : v;
-      update();
-    } else if (tagEl) {
+    if (tagEl) {
       ev.preventDefault();
       const v = tagEl.dataset.tag || tagEl.dataset.k;
       state.tag = state.tag === v ? "" : v;

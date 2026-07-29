@@ -18,12 +18,19 @@
         <h1>투자 원장</h1>
       </a>
       <p class="sub">Claude와 나눈 판단들을 다시 꺼내 보기 위한 기록. 정답이 아니라 그때의 근거를 남긴다.</p>
-      <div class="tape" id="tape" role="group" aria-label="티커 필터"><span class="lead">Tracking</span></div>
     </header>
 
     <div class="controls" role="search">
       <label class="vh" for="q">기록 검색</label>
-      <input class="search" id="q" type="search" placeholder="검색 — 제목 · 요약 · 티커" autocomplete="off" />
+      <div class="searchbox">
+        <svg class="sicon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="6.8" cy="6.8" r="4.3" />
+          <path d="M10.1 10.1 14 14" stroke-linecap="round" />
+        </svg>
+        <input class="search" id="q" type="search" placeholder="제목 · 요약 · 티커 검색" autocomplete="off"
+               role="combobox" aria-expanded="false" aria-controls="tksuggest" aria-autocomplete="list" />
+        <ul class="suggest" id="tksuggest" role="listbox" aria-label="티커" hidden></ul>
+      </div>
       <div class="tagbar" id="tagbar" role="group" aria-label="태그 필터"></div>
       <div class="filter-status" id="fstatus" aria-live="polite" hidden>
         <span id="fcount"></span>
